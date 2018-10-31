@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
+    <script src="js/vendor/jquery-3.2.1.min.js"></script>
+    <title>한국방송미디어공학회</title>
+</head>
+<body>
+<script>
+    AFRAME.registerComponent('session', {
+        init: function () {
+            var img = document.querySelector("#img_proc");
+            var vr = document.querySelector("#vr_ar");
+            var net = document.querySelector("#network");
+            var plat = document.querySelector("#platform");
+
+            function playVideoOnClick (selector) {
+                el = document.querySelector(selector);
+
+                if (el) {
+                    addListener();
+                } else {
+                    window.addEventListener('load', addListener);
+                }
+
+                function addListener () {
+                    if (el.paused) {
+                        window.addEventListener('click', handleFirstClick);
+                    }
+
+                    function handleFirstClick () {
+                        try {
+                            if (el.muted) {
+                                delete el.muted;
+                            }
+                            if (el.paused) {
+                                el.play();
+                            }
+                        } catch (e) {
+                        }
+                        removeHandleFirstClick();
+                    }
+
+                    function removeHandleFirstClick () {
+                        window.removeEventListener('click', handleFirstClick);
+                    }
+                }
+            } playVideoOnClick('video');
+            function popup(id) {
+                document.querySelector(id).setAttribute('visible', true);
+            }
+
+            function popfalse(id) {
+                document.querySelector(id).setAttribute('visible', false);
+            }
+
+            img.onmouseleave = function (evt) {
+                popfalse("#popup_img");
+            };
+            img.onmouseenter = function (evt) {
+                popup("#popup_img");
+            };
+            vr.onmouseleave = function (evt) {
+                popfalse("#popup_vr");
+            };
+            vr.onmouseenter = function (evt) {
+                popup("#popup_vr");
+            };
+            net.onmouseleave = function (evt) {
+                popfalse("#popup_net");
+            };
+            net.onmouseenter = function (evt) {
+                popup("#popup_net");
+            };
+            plat.onmouseleave = function (evt) {
+                popfalse("#popup_plat");
+            };
+            plat.onmouseenter = function (evt) {
+                popup("#popup_plat");
+            };
+        },
+        tick: function () {
+            document.querySelector('#img_proc').onclick = function () {
+                location.replace('http://117.17.184.190:8080/VirtualPoster/index.html');
+            };
+            document.querySelector('#vr_ar').onclick = function () {
+                location.replace('http://117.17.184.190:8080/VirtualPoster/index.html');
+            };
+            document.querySelector('#network').onclick = function () {
+                location.replace('http://117.17.184.190:8080/VirtualPoster/index.html');
+            };
+            document.querySelector('#platform').onclick = function () {
+                location.replace('http://117.17.184.190:8080/VirtualPoster/index.html');
+            };
+        }
+    });
+</script>
+<a-scene session>
+    <a-entity>
+        <a-camera id="camera">
+            <a-cursor id="cursor">
+                <a-entity id="popup_img" geometry="primitive: plane; height:0.1; width:0.5" material="color: yellow"
+                          text="value:Image Processing; color:blue; width:1; align:center" visible="false"></a-entity>
+                <a-entity id="popup_vr" geometry="primitive: plane; height:0.1; width:0.5" material="color: yellow"
+                          text="value:VR/AR; color:blue; width:1; align:center" visible="false"></a-entity>
+                <a-entity id="popup_net" geometry="primitive: plane; height:0.1; width:0.5" material="color: yellow"
+                          text="value:Network; color:blue; width:1; align:center" visible="false"></a-entity>
+                <a-entity id="popup_plat" geometry="primitive: plane; height:0.1; width:0.5" material="color: yellow"
+                          text="value:Platform; color:blue; width:1; align:center" visible="false"></a-entity>
+            </a-cursor>
+        </a-camera>
+        <img id="hmd" crossorigin="anonymous" src="./src/img/hmd.png">
+    </a-entity>
+    <a-entity position="-10 5 10" rotation="0 135 0"
+              text="width: 15; color: black; value: The Korean Institute of Broadcast and Media Engineering 2018 Fall Academic Conference">
+    </a-entity>
+    <a-entity scale="0.5 0.5 0.5" id="img_proc" geometry="primitive: box" material="src:#hmd"
+              position="5 1 3"></a-entity>
+    <a-entity scale="0.5 0.5 0.5" id="vr_ar" geometry="primitive: box" material="src:#hmd"
+              position="-5 1 -3"></a-entity>
+    <a-entity scale="0.5 0.5 0.5" id="network" geometry="primitive: box" material="src:#hmd"
+              position="2 1 5"></a-entity>
+    <a-entity scale="0.5 0.5 0.5" id="platform" geometry="primitive: box" material="src:#hmd"
+              position="-2 1 -5"></a-entity>
+    <a-sky src="./img/conference.jpg"></a-sky>
+</a-scene>
+</body>
+</html>

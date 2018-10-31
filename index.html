@@ -1,0 +1,162 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
+    <script src="js/vendor/jquery-3.2.1.min.js"></script>
+    <script>
+        var video_1;
+        var video_2;
+        var video_3;
+        var video_4;
+        var videoArr = [];
+        var tmp = 0;
+        var help = true;
+
+        AFRAME.registerComponent('session', {
+            schema: {
+                rotate: {type: 'float', default: 0},
+                event: {type: 'string', default: 'update Evt'},
+                isLoaded: {type: 'boolean', default: false},
+            },
+
+            init: function () {
+
+                video_1 = document.getElementById("1");
+                video_2 = document.getElementById("2");
+                video_3 = document.getElementById("3");
+                video_4 = document.getElementById("4");
+
+                videoArr.push(video_1);
+                videoArr.push(video_2);
+                videoArr.push(video_3);
+                videoArr.push(video_4);
+
+
+                var cursor = document.querySelector("#cursor");
+
+                cursor.onmouseleave = function (evt) {
+                    this.setAttribute('color', 'black');
+                    var scale = evt.detail.intersectedEl.object3D.scale;
+                    scale.set(0.5, 0.5, 0.5);
+                };
+
+                cursor.onmouseenter = function (evt) {
+                    this.setAttribute('color', 'springgreen');
+                    var scale = evt.detail.intersectedEl.object3D.scale;
+                    scale.set(2, 2, 2);
+                };
+
+                videoArr.forEach(function (item) {
+                    item.oncanplay = function(event) {
+                        tmp++;
+                    }
+                });
+
+            },
+
+            tick: function () {
+                if(tmp === 4) {
+                    this.isLoaded = true;
+                    console.log("All video loaded!");
+                    tmp = 0
+                }
+
+                if(this.isLoaded) {
+                    var regYaw = function (yaw) {
+                        if (yaw >= 0)
+                            yaw -= 360 * parseInt(yaw / 360);
+                        else
+                            yaw += 360 * ((parseInt(yaw / 360) * -1) + 1);
+                        return yaw;
+                    };
+
+                    this.rotate = regYaw(document.querySelector("#camera").getAttribute('rotation').y)
+
+
+                    var play = function (id) {
+                        videoArr.forEach(function (item) {
+                            if (item.id === id)
+                                item.play();
+                            else
+                                item.pause();
+                        })
+                    };
+
+                    var auto = function (value) {
+
+                        var yaw = regYaw(value);
+
+                        // Top
+                        if ((yaw >= 315 || yaw < 45) && help) {
+                            play("1");
+                            help = false;
+                            console.log("play 1")
+                        }
+                        // Left
+                        else if ((yaw >= 45 && yaw < 135) && !help) {
+                            play("2");
+                            help = true;
+                            console.log("play 2")
+                        }
+                        // Bottom
+                        else if ((yaw >= 135 && yaw < 225) && help) {
+                            play("3");
+                            help = false;
+                            console.log("play 3")
+                        }
+                        // Right
+                        else if ((yaw >= 225 && yaw < 315) && !this.help) {
+                            play("4");
+                            this.help = true;
+                            console.log("play 4")
+                        }
+                    };
+
+                    auto(this.rotate);
+                }
+                document.querySelector('#refresh-button').onclick = function() {
+                    location.replace('http://117.17.184.190:8080/VirtualPoster/sound_Virtual.html');
+                };
+
+            }
+        });
+    </script>
+</head>
+<body>
+
+<a-scene session>
+    <!--<a-entity id=camera camera="active: true" look-controls wasd-controls position="0 0 0" data-aframe-default-camera>
+
+    <!--camera는 내 화면의 위치, cursor 마우스 커서같은거-->
+    <a-entity id="entity" position="0 0 0">
+        <a-camera id="camera">
+            <a-cursor id="cursor"></a-cursor>
+        </a-camera>
+    </a-entity>
+
+    <!-- assets은 video, img같은 자원을 로딩해줌 (화면 띄우기 ㄴㄴ)-->
+    <a-assets>
+        <video id="1" loop="true" src="./src/sg.mp4"></video>
+        <video id="2" loop="true" src="./src/sg.mp4"></video>
+        <video id="3" loop="true" src="./src/sg.mp4"></video>
+        <video id="4" loop="true" src="./src/sg.mp4"></video>
+        <img src="./img/conference.jpg" id="conference">
+    </a-assets>
+
+    <!-- position "좌우, undown depth" -->
+    <!--a-video를 통해 assets에서 로드해준 동영상 사용 ascene에 어떻게 배치할건지 설정-->
+    <a-video id="video1" src="#1" width="16" height="9" position="0 0 -20" scale="0.5 0.5 0.5"
+             rotation="0 0 0"></a-video>
+    <a-video id="video2" src="#2" width="16" height="9" position="-20 0 0" scale="0.5 0.5 0.5"
+             rotation="0 90 0"></a-video>
+    <a-video id="video3" src="#3" width="16" height="9" position="0 0 20" scale="0.5 0.5 0.5"
+             rotation="0 180 0"></a-video>
+    <a-video id="video4" src="#4" width="16" height="9" position="20 0 0" scale="0.5 0.5 0.5"
+             rotation="0 270 0"></a-video>
+    <a-entity id="refresh-button" geometry="primitive: box; height:0.1" material="color: red" position="0 5 0"></a-entity>
+    <a-sky src="#conference"></a-sky>
+    <!-- Defining the URL inline. Not recommended but more comfortable for web developers. -->
+</a-scene>
+
+</body>
+</html>
